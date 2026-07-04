@@ -369,7 +369,7 @@ function startParticles() {
   const canvas = document.getElementById('particles');
   if (!canvas || particleRAF) return;
   const ctx = canvas.getContext('2d');
-  let W = 0, H = 0, dpr = 1, parts = [];
+  let W = 0, H = 0, dpr = 1;
   const mouse = { x: -9999, y: -9999 };
 
   function resize() {
@@ -379,12 +379,21 @@ function startParticles() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   resize();
-  const N = Math.max(30, Math.min(80, Math.floor(W * H / 16000)));
-  parts = Array.from({ length: N }, () => ({
+  const nodeN = Math.max(20, Math.min(44, Math.floor(W * H / 26000)));
+  const nodes = Array.from({ length: nodeN }, () => ({
     x: Math.random() * W, y: Math.random() * H,
-    vx: (Math.random() - .5) * 0.28, vy: (Math.random() - .5) * 0.28,
-    r: Math.random() * 1.7 + 0.6,
+    vx: (Math.random() - .5) * 0.25, vy: (Math.random() - .5) * 0.25,
+    r: Math.random() * 1.6 + 0.6,
     c: Math.random() < 0.55 ? '0,229,255' : '139,92,246',
+  }));
+  // white motes drifting up through the whole screen
+  const floatN = Math.max(45, Math.min(100, Math.floor(W * H / 10500)));
+  const floaters = Array.from({ length: floatN }, () => ({
+    x: Math.random() * W, y: Math.random() * H,
+    vx: (Math.random() - .5) * 0.16, vy: -(Math.random() * 0.28 + 0.05),
+    r: Math.random() * 1.6 + 0.5,
+    a: Math.random() * 0.45 + 0.25,
+    tw: Math.random() * Math.PI * 2, tws: Math.random() * 0.03 + 0.008,
   }));
 
   const onMove = e => { const b = canvas.getBoundingClientRect(); mouse.x = e.clientX - b.left; mouse.y = e.clientY - b.top; };
@@ -394,7 +403,21 @@ function startParticles() {
 
   function frame() {
     ctx.clearRect(0, 0, W, H);
-    for (const p of parts) {
+
+    // white floating particles
+    for (const f of floaters) {
+      f.x += f.vx; f.y += f.vy; f.tw += f.tws;
+      if (f.y < -5) { f.y = H + 5; f.x = Math.random() * W; }
+      if (f.x < -5) f.x = W + 5; else if (f.x > W + 5) f.x = -5;
+      ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${f.a * (0.55 + 0.45 * Math.sin(f.tw))})`;
+      ctx.shadowColor = 'rgba(255,255,255,0.8)'; ctx.shadowBlur = 6;
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+
+    // cyan/violet network
+    for (const p of nodes) {
       p.x += p.vx; p.y += p.vy;
       if (p.x < 0) p.x += W; else if (p.x > W) p.x -= W;
       if (p.y < 0) p.y += H; else if (p.y > H) p.y -= H;
@@ -404,13 +427,13 @@ function startParticles() {
       ctx.fill();
     }
     ctx.shadowBlur = 0;
-    for (let i = 0; i < parts.length; i++) {
-      const a = parts[i];
-      for (let j = i + 1; j < parts.length; j++) {
-        const b = parts[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
+    for (let i = 0; i < nodes.length; i++) {
+      const a = nodes[i];
+      for (let j = i + 1; j < nodes.length; j++) {
+        const b = nodes[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
         if (d < 120) {
           ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-          ctx.strokeStyle = `rgba(0,229,255,${0.13 * (1 - d / 120)})`;
+          ctx.strokeStyle = `rgba(0,229,255,${0.12 * (1 - d / 120)})`;
           ctx.lineWidth = 1; ctx.stroke();
         }
       }
@@ -434,9 +457,17 @@ function stopParticles() {
 // ---------- login FX: music ----------
 // Default is a free-to-use placeholder track — swap in your own by dropping
 // public/music.mp3 (or give me a link) and pointing TRACK.url at it.
-const TRACK = { name: 'Ambient — The Rush', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' };
+const TRACK = { url: 'music.mp3' };
 const bgm = document.getElementById('bgm');
 let userPausedMusic = false;
+
+function updateVolUI(v) {
+  const pct = document.getElementById('volPct');
+  const sl = document.getElementById('musicVol');
+  if (pct) pct.textContent = v;
+  // rotated slider: left→right renders bottom→top, so fill from 0 to v%
+  if (sl) sl.style.background = `linear-gradient(90deg, var(--cyan) 0 ${v}%, rgba(255,255,255,.16) ${v}% 100%)`;
+}
 
 function initMusic() {
   if (!bgm) return;
@@ -445,14 +476,14 @@ function initMusic() {
   volEl.value = vol;
   bgm.volume = vol / 100;
   bgm.src = TRACK.url;
-  document.getElementById('musicName').textContent = TRACK.name;
+  updateVolUI(vol);
 
   document.getElementById('musicToggle').onclick = (e) => {
     e.stopPropagation();
     userPausedMusic = false;
     if (bgm.paused) playMusic(); else { bgm.pause(); userPausedMusic = true; setMusicUI(false); }
   };
-  volEl.oninput = () => { bgm.volume = volEl.value / 100; localStorage.setItem('ft_vol', volEl.value); };
+  volEl.oninput = () => { bgm.volume = volEl.value / 100; localStorage.setItem('ft_vol', volEl.value); updateVolUI(volEl.value); };
   armMusicAutostart();
 }
 function playMusic() {
