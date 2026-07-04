@@ -42,6 +42,8 @@ $('btnLogout').onclick = () => {
   clearInterval(pollTimer);
   $('appView').classList.add('hidden');
   $('authView').classList.remove('hidden');
+  startParticles();
+  armMusicAutostart();
 };
 
 // ---------- api ----------
@@ -61,6 +63,8 @@ async function api(path, method = 'GET', body = null, auth = true) {
 function showApp() {
   $('authView').classList.add('hidden');
   $('appView').classList.remove('hidden');
+  stopParticles();
+  stopMusic();
   refresh();
   clearInterval(pollTimer);
   pollTimer = setInterval(refresh, 2000);
@@ -359,6 +363,124 @@ $('btnFlatten').onclick = async () => {
 $('qtyMinus').onclick = () => { $('qty').value = Math.max(1, (parseInt($('qty').value, 10) || 1) - 1); };
 $('qtyPlus').onclick = () => { $('qty').value = (parseInt($('qty').value, 10) || 0) + 1; };
 
+// ---------- login FX: floating particles ----------
+let particleRAF = null;
+function startParticles() {
+  const canvas = document.getElementById('particles');
+  if (!canvas || particleRAF) return;
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0, dpr = 1, parts = [];
+  const mouse = { x: -9999, y: -9999 };
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  const N = Math.max(30, Math.min(80, Math.floor(W * H / 16000)));
+  parts = Array.from({ length: N }, () => ({
+    x: Math.random() * W, y: Math.random() * H,
+    vx: (Math.random() - .5) * 0.28, vy: (Math.random() - .5) * 0.28,
+    r: Math.random() * 1.7 + 0.6,
+    c: Math.random() < 0.55 ? '0,229,255' : '139,92,246',
+  }));
+
+  const onMove = e => { const b = canvas.getBoundingClientRect(); mouse.x = e.clientX - b.left; mouse.y = e.clientY - b.top; };
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('resize', resize);
+  canvas._cleanup = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('resize', resize); };
+
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of parts) {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x += W; else if (p.x > W) p.x -= W;
+      if (p.y < 0) p.y += H; else if (p.y > H) p.y -= H;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.c},0.85)`;
+      ctx.shadowColor = `rgba(${p.c},0.9)`; ctx.shadowBlur = 7;
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    for (let i = 0; i < parts.length; i++) {
+      const a = parts[i];
+      for (let j = i + 1; j < parts.length; j++) {
+        const b = parts[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
+        if (d < 120) {
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(0,229,255,${0.13 * (1 - d / 120)})`;
+          ctx.lineWidth = 1; ctx.stroke();
+        }
+      }
+      const mdx = a.x - mouse.x, mdy = a.y - mouse.y, md = Math.hypot(mdx, mdy);
+      if (md < 160) {
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mouse.x, mouse.y);
+        ctx.strokeStyle = `rgba(139,92,246,${0.28 * (1 - md / 160)})`;
+        ctx.lineWidth = 1; ctx.stroke();
+      }
+    }
+    particleRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+function stopParticles() {
+  if (particleRAF) { cancelAnimationFrame(particleRAF); particleRAF = null; }
+  const c = document.getElementById('particles');
+  if (c && c._cleanup) { c._cleanup(); c._cleanup = null; }
+}
+
+// ---------- login FX: music ----------
+// Default is a free-to-use placeholder track — swap in your own by dropping
+// public/music.mp3 (or give me a link) and pointing TRACK.url at it.
+const TRACK = { name: 'Ambient — The Rush', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' };
+const bgm = document.getElementById('bgm');
+let userPausedMusic = false;
+
+function initMusic() {
+  if (!bgm) return;
+  const vol = parseInt(localStorage.getItem('ft_vol') ?? '35', 10);
+  const volEl = document.getElementById('musicVol');
+  volEl.value = vol;
+  bgm.volume = vol / 100;
+  bgm.src = TRACK.url;
+  document.getElementById('musicName').textContent = TRACK.name;
+
+  document.getElementById('musicToggle').onclick = (e) => {
+    e.stopPropagation();
+    userPausedMusic = false;
+    if (bgm.paused) playMusic(); else { bgm.pause(); userPausedMusic = true; setMusicUI(false); }
+  };
+  volEl.oninput = () => { bgm.volume = volEl.value / 100; localStorage.setItem('ft_vol', volEl.value); };
+  armMusicAutostart();
+}
+function playMusic() {
+  bgm.play().then(() => setMusicUI(true)).catch(() => setMusicUI(false));
+}
+function setMusicUI(on) {
+  const t = document.getElementById('musicToggle');
+  if (!t) return;
+  t.textContent = on ? '❚❚' : '▶';
+  t.classList.toggle('playing', on);
+}
+function stopMusic() { if (bgm) bgm.pause(); setMusicUI(false); }
+// browsers block autoplay until a gesture — start on the first click/keypress
+function armMusicAutostart() {
+  const kick = () => {
+    document.removeEventListener('click', kick);
+    document.removeEventListener('keydown', kick);
+    if (!userPausedMusic && bgm && bgm.paused) playMusic();
+  };
+  document.addEventListener('click', kick);
+  document.addEventListener('keydown', kick);
+}
+
 // ---------- boot ----------
-if (token) showApp();
-else $('authView').classList.remove('hidden');
+initMusic();
+if (token) {
+  showApp();
+} else {
+  $('authView').classList.remove('hidden');
+  startParticles();
+}

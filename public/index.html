@@ -36,6 +36,7 @@
 
 <!-- ============ AUTH ============ -->
 <div id="authView" class="auth-wrap hidden">
+  <canvas id="particles" class="particles"></canvas>
   <div class="auth-card">
     <div class="brand">
       <img src="logo.png" alt="" class="brand-logo" onerror="this.style.display='none'">
@@ -73,6 +74,15 @@
     </div>
     <div class="auth-foot">Real CME data · Zero slippage · Instant fills</div>
   </div>
+
+  <div class="music-widget" id="musicWidget">
+    <button class="music-btn" id="musicToggle" type="button" aria-label="Play music">▶</button>
+    <div class="music-info">
+      <span class="music-name" id="musicName">tap ▶ for music</span>
+      <input class="music-slider" id="musicVol" type="range" min="0" max="100" value="35" aria-label="Volume">
+    </div>
+  </div>
+  <audio id="bgm" loop preload="none"></audio>
 </div>
 
 <!-- ============ PLATFORM ============ -->
