@@ -1,0 +1,15 @@
+{
+  "name": "optiondecay-the-rush",
+  "version": "1.0.0",
+  "description": "OptionDecay's The Rush — futures paper-trading tournament",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.34.0"
+  }
+}

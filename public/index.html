@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OptionDecay's The Rush</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Unbounded:wght@700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- animated background -->
+<div class="bg">
+  <div class="bg-grid"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+  <div class="bg-vignette"></div>
+</div>
+
+<!-- ============ AUTH ============ -->
+<div id="authView" class="auth-wrap hidden">
+  <div class="auth-card">
+    <div class="brand">
+      <img src="logo.png" alt="" class="brand-logo" onerror="this.style.display='none'">
+      <div class="brand-eyebrow">OPTIONDECAY PRESENTS</div>
+      <h1 class="brand-title">The Rush</h1>
+    </div>
+
+    <div class="tabs">
+      <button id="tabLogin" class="tab active" type="button">Log in</button>
+      <button id="tabRegister" class="tab" type="button">Enter The Rush</button>
+    </div>
+
+    <form id="authForm">
+      <div id="nameRow" class="field hidden">
+        <label>Callsign <span class="lbl-dim">/ leaderboard name</span></label>
+        <input id="fName" type="text" maxlength="40" placeholder="e.g. Voltage" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="fEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="fPassword" type="password" placeholder="min 6 characters" autocomplete="current-password" required>
+      </div>
+      <button id="authSubmit" class="btn-primary" type="submit"><span>Log in</span></button>
+      <div id="authError" class="auth-error"></div>
+    </form>
+
+    <div class="rules">
+      <div class="rule"><span class="rule-v">$50K</span><span class="rule-k">Start balance</span></div>
+      <div class="rule"><span class="rule-v">$2K</span><span class="rule-k">Max drawdown</span></div>
+      <div class="rule"><span class="rule-v">$1K</span><span class="rule-k">Daily loss cap</span></div>
+      <div class="rule"><span class="rule-v">2/20</span><span class="rule-k">Minis / micros</span></div>
+    </div>
+    <div class="auth-foot">Real CME data · Zero slippage · Instant fills</div>
+  </div>
+</div>
+
+<!-- ============ PLATFORM ============ -->
+<div id="appView" class="hidden">
+  <header class="topbar">
+    <div class="brand-mini">
+      <img src="logo.png" alt="" class="logo-img" onerror="this.style.display='none'">
+      <div class="brand-mini-txt">
+        <span class="brand-mini-eyebrow">OPTIONDECAY'S</span>
+        <span class="brand-mini-title">The Rush</span>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><label>Balance</label><span id="sBalance" class="mono">—</span></div>
+      <div class="stat"><label>Equity</label><span id="sEquity" class="mono">—</span></div>
+      <div class="stat"><label>Open P&amp;L</label><span id="sUpnl" class="mono">—</span></div>
+      <div class="stat"><label>Day P&amp;L</label><span id="sDayPnl" class="mono">—</span></div>
+      <div class="stat"><label>DD Floor</label><span id="sFloor" class="mono">—</span></div>
+    </div>
+    <div class="user-box">
+      <span id="statusBadge" class="badge ok">ACTIVE</span>
+      <span id="uName" class="uname"></span>
+      <button id="btnLogout" class="btn-ghost" type="button">Exit</button>
+    </div>
+  </header>
+
+  <div class="ticker"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <main class="grid">
+    <!-- watchlist -->
+    <section class="panel watchlist">
+      <h2><span class="h-accent"></span>Markets <span class="live-dot" id="liveDot"></span></h2>
+      <div id="watchRows"></div>
+      <div class="risk-strip">
+        <div class="risk">
+          <div class="risk-head"><span>Daily loss used</span><span id="riskDailyTxt" class="mono">—</span></div>
+          <div class="risk-bar"><div id="riskDailyFill" class="risk-fill"></div></div>
+        </div>
+        <div class="risk">
+          <div class="risk-head"><span>Drawdown used</span><span id="riskDDTxt" class="mono">—</span></div>
+          <div class="risk-bar"><div id="riskDDFill" class="risk-fill"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- chart + order -->
+    <section class="panel chart-panel">
+      <div class="chart-head">
+        <div>
+          <h2 id="chartTitle">ES</h2>
+          <span id="chartName" class="chart-name"></span>
+        </div>
+        <div class="tf-group" id="tfGroup">
+          <button class="tf-btn" data-tf="1m" type="button">1m</button>
+          <button class="tf-btn" data-tf="5m" type="button">5m</button>
+          <button class="tf-btn" data-tf="15m" type="button">15m</button>
+          <button class="tf-btn" data-tf="1h" type="button">1h</button>
+          <button class="tf-btn" data-tf="1d" type="button">1D</button>
+        </div>
+        <span id="chartPrice" class="chart-price mono">—</span>
+      </div>
+      <div id="chartBox"></div>
+      <div class="chart-attrib">Charts powered by <a href="https://www.tradingview.com/" target="_blank" rel="noopener">TradingView</a> Lightweight Charts™</div>
+
+      <div class="order-box">
+        <div class="qty-wrap">
+          <label>Qty</label>
+          <div class="qty-ctrl">
+            <button id="qtyMinus" class="qty-btn" type="button">−</button>
+            <input id="qty" class="mono" type="number" min="1" step="1" value="1">
+            <button id="qtyPlus" class="qty-btn" type="button">+</button>
+          </div>
+          <span id="limitHint" class="hint"></span>
+        </div>
+        <button id="btnBuy" class="btn-trade btn-buy" type="button">Buy <span id="buySym">ES</span></button>
+        <button id="btnSell" class="btn-trade btn-sell" type="button">Sell <span id="sellSym">ES</span></button>
+        <button id="btnFlatten" class="btn-flat" type="button">Flatten all</button>
+      </div>
+      <div id="orderMsg" class="order-msg"></div>
+    </section>
+
+    <!-- leaderboard -->
+    <section class="panel leaderboard">
+      <h2><span class="h-accent"></span>Leaderboard</h2>
+      <table>
+        <thead><tr><th>#</th><th>Trader</th><th class="num">Equity</th><th class="num">P&amp;L</th><th class="num">St</th></tr></thead>
+        <tbody id="lbBody"></tbody>
+      </table>
+    </section>
+
+    <!-- positions -->
+    <section class="panel positions">
+      <h2><span class="h-accent"></span>Positions</h2>
+      <table>
+        <thead><tr><th>Sym</th><th class="num">Qty</th><th class="num">Avg</th><th class="num">Last</th><th class="num">Open P&amp;L</th></tr></thead>
+        <tbody id="posBody"></tbody>
+      </table>
+      <div id="noPos" class="empty">Flat — no open positions</div>
+    </section>
+
+    <!-- trades -->
+    <section class="panel trades">
+      <h2><span class="h-accent"></span>Fills</h2>
+      <table>
+        <thead><tr><th>Time</th><th>Sym</th><th>Side</th><th class="num">Qty</th><th class="num">Price</th><th class="num">P&amp;L</th></tr></thead>
+        <tbody id="tradesBody"></tbody>
+      </table>
+      <div id="noTrades" class="empty">No fills yet</div>
+    </section>
+  </main>
+</div>
+
+<script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
