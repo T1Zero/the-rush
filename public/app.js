@@ -43,7 +43,7 @@ $('btnLogout').onclick = () => {
   $('appView').classList.add('hidden');
   $('authView').classList.remove('hidden');
   startParticles();
-  armMusicAutostart();
+  initMusic();
 };
 
 // ---------- api ----------
@@ -469,13 +469,15 @@ function updateVolUI(v) {
   if (sl) sl.style.background = `linear-gradient(90deg, var(--cyan) 0 ${v}%, rgba(255,255,255,.16) ${v}% 100%)`;
 }
 
+const isDesktop = () => window.matchMedia('(min-width: 561px)').matches;
+
 function initMusic() {
-  if (!bgm) return;
+  if (!bgm || !isDesktop()) return; // music is desktop-only
   const vol = parseInt(localStorage.getItem('ft_vol') ?? '35', 10);
   const volEl = document.getElementById('musicVol');
   volEl.value = vol;
   bgm.volume = vol / 100;
-  bgm.src = TRACK.url;
+  if (!bgm.src) bgm.src = TRACK.url;
   updateVolUI(vol);
 
   document.getElementById('musicToggle').onclick = (e) => {
@@ -484,6 +486,11 @@ function initMusic() {
     if (bgm.paused) playMusic(); else { bgm.pause(); userPausedMusic = true; setMusicUI(false); }
   };
   volEl.oninput = () => { bgm.volume = volEl.value / 100; localStorage.setItem('ft_vol', volEl.value); updateVolUI(volEl.value); };
+
+  // autostart on entering / reload — browsers may block sound until a gesture,
+  // so we also arm a one-time start on the first click/keypress as a fallback.
+  userPausedMusic = false;
+  playMusic();
   armMusicAutostart();
 }
 function playMusic() {
@@ -508,10 +515,10 @@ function armMusicAutostart() {
 }
 
 // ---------- boot ----------
-initMusic();
 if (token) {
   showApp();
 } else {
   $('authView').classList.remove('hidden');
   startParticles();
+  initMusic();
 }

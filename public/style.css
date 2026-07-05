@@ -649,9 +649,19 @@ tbody tr:last-child td { border-bottom: none; }
 .music-btn.playing { animation: musicPulse 1.6s ease-in-out infinite; }
 @keyframes musicPulse { 50% { box-shadow: 0 0 28px rgba(139, 92, 246, .75); } }
 
+.song-credit {
+  position: fixed; right: 18px; bottom: 16px; z-index: 6;
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 13px;
+  font-size: 11px; font-weight: 600; letter-spacing: .3px; color: var(--muted);
+  background: rgba(10, 13, 26, .5);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+.song-credit span { opacity: .6; font-weight: 500; }
+
+/* music + its slider are desktop-only */
 @media (max-width: 560px) {
-  .music-widget { left: 8px; padding: 11px 8px; gap: 10px; }
-  .vol-track { height: 104px; }
-  .music-slider { width: 104px; }
-  .music-btn { width: 34px; height: 34px; }
+  .music-widget, .song-credit { display: none !important; }
 }
