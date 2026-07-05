@@ -109,7 +109,7 @@ function render() {
   const badge = $('statusBadge');
   if (a.blown) { badge.textContent = 'BLOWN'; badge.className = 'badge dead'; }
   else if (a.dailyLocked) { badge.textContent = 'DAILY LOCK'; badge.className = 'badge warn'; }
-  else if (a.sessionClosed) { badge.textContent = 'SESSION CLOSED'; badge.className = 'badge warn'; }
+  else if (!a.canTrade) { badge.textContent = 'MARKET CLOSED'; badge.className = 'badge warn'; }
   else { badge.textContent = 'ACTIVE'; badge.className = 'badge ok'; }
 
   // risk meters
@@ -152,11 +152,11 @@ function render() {
   $('chartPrice').textContent = sel ? fmtPx(sel.price) : '—';
   $('buySym').textContent = selected;
   $('sellSym').textContent = selected;
-  const tradingHalted = a.blown || a.dailyLocked || a.sessionClosed;
+  const tradingHalted = a.blown || a.dailyLocked || !a.canTrade;
   $('btnBuy').disabled = tradingHalted;
   $('btnSell').disabled = tradingHalted;
-  $('limitHint').textContent = a.sessionClosed
-    ? 'Market closed — no overnight holding · resumes 6:00pm ET'
+  $('limitHint').textContent = !a.canTrade
+    ? 'Market closed — trading opens 9:30 AM ET (Mon–Fri)'
     : (sel ? `max ${sel.maxContracts} · $${sel.pointValue}/pt` : '');
   ensureChart();
   if (sel) tickChart(sel.price);
