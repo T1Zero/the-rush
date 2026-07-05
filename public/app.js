@@ -160,6 +160,9 @@ function render() {
     : (sel ? `max ${sel.maxContracts} · $${sel.pointValue}/pt` : '');
   ensureChart();
   if (sel) tickChart(sel.price);
+  const myPos = a.positions.find(p => p.symbol === selected) || null;
+  updateEntryLine(myPos);
+  updatePosOverlay(myPos);
 
   // positions
   const posBody = $('posBody');
@@ -197,6 +200,7 @@ function render() {
   // leaderboard — organizer (admin) only. Regular users never receive `lb`.
   document.body.classList.toggle('is-admin', !!a.isAdmin);
   if (a.isAdmin && lb) {
+    $('lbCount').textContent = lb.length;
     const medal = i => i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
     $('lbBody').innerHTML = lb.map((u, i) => `<tr class="${u.name === a.name ? 'lb-me' : ''}">
       <td class="rank ${medal(i)}">${String(i + 1).padStart(2, '0')}</td>
@@ -323,6 +327,37 @@ function tickChart(price) {
     lastBar = { time: t, open: lastBar.close, high: Math.max(lastBar.close, price), low: Math.min(lastBar.close, price), close: price };
     candleSeries.update({ ...lastBar });
   }
+}
+
+// ---------- entry-price line + position P&L counter ----------
+let entryLine = null, entryKey = null;
+function updateEntryLine(pos) {
+  if (!candleSeries) return;
+  const key = pos ? `${selected}|${pos.qty}|${pos.avg}` : null;
+  if (key === entryKey) return;
+  if (entryLine) { try { candleSeries.removePriceLine(entryLine); } catch (e) {} entryLine = null; }
+  entryKey = key;
+  if (!pos) return;
+  entryLine = candleSeries.createPriceLine({
+    price: pos.avg,
+    color: pos.qty > 0 ? '#00ff9d' : '#ff3b5c',
+    lineWidth: 2,
+    lineStyle: 2, // dashed
+    axisLabelVisible: true,
+    title: `Entry ${pos.qty > 0 ? 'LONG' : 'SHORT'} ${Math.abs(pos.qty)}`,
+  });
+}
+function updatePosOverlay(pos) {
+  const el = document.getElementById('chartPos');
+  if (!el) return;
+  if (!pos) { el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  const cls = pos.upnl > 0 ? 'pos' : pos.upnl < 0 ? 'neg' : '';
+  el.innerHTML =
+    `<div class="cp-row"><span class="cp-side ${pos.qty > 0 ? 'long' : 'short'}">${pos.qty > 0 ? 'LONG' : 'SHORT'} ${Math.abs(pos.qty)}</span>` +
+    `<span class="cp-entry">@ ${fmtPx(pos.avg)}</span></div>` +
+    `<div class="cp-pnl ${cls}">${fmtMoney(pos.upnl)}</div>` +
+    `<div class="cp-label">Open P&amp;L</div>`;
 }
 
 // timeframe switcher

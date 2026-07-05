@@ -674,3 +674,30 @@ tbody tr:last-child td { border-bottom: none; }
 @media (max-width: 560px) {
   .music-widget, .song-credit { display: none !important; }
 }
+
+/* ============ LEADERBOARD SCROLL + COUNT ============ */
+.lb-count { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); font-weight: 700; margin-left: auto; }
+.lb-scroll { max-height: 460px; overflow-y: auto; margin: -4px -6px 0; padding: 0 6px; }
+.leaderboard thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: #0d1121;
+}
+
+/* ============ CHART POSITION / P&L OVERLAY ============ */
+.chart-wrap { position: relative; }
+.chart-pos {
+  position: absolute; top: 14px; left: 14px; z-index: 3;
+  padding: 9px 13px; border-radius: 11px;
+  background: rgba(8, 11, 22, .82);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .4);
+  pointer-events: none;
+}
+.cp-row { display: flex; gap: 9px; align-items: baseline; }
+.cp-side { font-family: var(--font-display); font-weight: 700; font-size: 12px; letter-spacing: .5px; }
+.cp-side.long { color: var(--green); }
+.cp-side.short { color: var(--red); }
+.cp-entry { font-family: var(--font-mono); color: var(--muted); font-size: 11px; }
+.cp-pnl { font-family: var(--font-mono); font-weight: 700; font-size: 20px; margin-top: 3px; line-height: 1; }
+.cp-label { font-size: 9px; font-weight: 600; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
