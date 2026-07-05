@@ -595,7 +595,7 @@ tbody tr:last-child td { border-bottom: none; }
 .particles {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
-  z-index: 0; pointer-events: none;
+  z-index: 4; pointer-events: none;   /* above the card so particles drift over the whole thing */
 }
 .auth-card { z-index: 2; }
 
@@ -610,11 +610,6 @@ tbody tr:last-child td { border-bottom: none; }
   border: 1px solid var(--border);
   border-radius: 26px;
   box-shadow: 0 10px 34px rgba(0, 0, 0, .45);
-}
-.vol-pct {
-  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
-  color: var(--text); opacity: .75; min-width: 22px; text-align: center;
-  letter-spacing: -.5px;
 }
 .vol-track { height: 138px; width: 22px; display: flex; align-items: center; justify-content: center; }
 .music-slider {

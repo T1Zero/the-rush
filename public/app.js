@@ -379,7 +379,7 @@ function startParticles() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   resize();
-  const nodeN = Math.max(20, Math.min(44, Math.floor(W * H / 26000)));
+  const nodeN = Math.max(28, Math.min(60, Math.floor(W * H / 19000)));
   const nodes = Array.from({ length: nodeN }, () => ({
     x: Math.random() * W, y: Math.random() * H,
     vx: (Math.random() - .5) * 0.25, vy: (Math.random() - .5) * 0.25,
@@ -387,7 +387,7 @@ function startParticles() {
     c: Math.random() < 0.55 ? '0,229,255' : '139,92,246',
   }));
   // white motes drifting up through the whole screen
-  const floatN = Math.max(45, Math.min(100, Math.floor(W * H / 10500)));
+  const floatN = Math.max(80, Math.min(185, Math.floor(W * H / 6500)));
   const floaters = Array.from({ length: floatN }, () => ({
     x: Math.random() * W, y: Math.random() * H,
     vx: (Math.random() - .5) * 0.16, vy: -(Math.random() * 0.28 + 0.05),
@@ -462,9 +462,7 @@ const bgm = document.getElementById('bgm');
 let userPausedMusic = false;
 
 function updateVolUI(v) {
-  const pct = document.getElementById('volPct');
   const sl = document.getElementById('musicVol');
-  if (pct) pct.textContent = v;
   // rotated slider: left→right renders bottom→top, so fill from 0 to v%
   if (sl) sl.style.background = `linear-gradient(90deg, var(--cyan) 0 ${v}%, rgba(255,255,255,.16) ${v}% 100%)`;
 }
