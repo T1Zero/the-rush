@@ -203,15 +203,53 @@ function render() {
   if (a.isAdmin && lb) {
     $('lbCount').textContent = lb.length;
     const medal = i => i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
-    $('lbBody').innerHTML = lb.map((u, i) => `<tr class="${u.name === a.name ? 'lb-me' : ''}">
+    $('lbBody').innerHTML = lb.map((u, i) => `<tr class="lb-click ${u.name === a.name ? 'lb-me' : ''}" data-email="${escapeHtml(u.email || '')}" title="View trade history">
       <td class="rank ${medal(i)}">${String(i + 1).padStart(2, '0')}</td>
-      <td title="${escapeHtml(u.name)}">${escapeHtml(u.name)}</td>
+      <td>${escapeHtml(u.name)}</td>
       <td class="num">${fmtMoney0(u.equity)}</td>
       <td class="num ${pnlClass(u.pnl)}">${fmtMoney0(u.pnl)}</td>
       <td class="num">${u.status === 'BLOWN' ? '💀' : u.status === 'LOCKED' ? '🔒' : '🟢'}</td>
     </tr>`).join('');
+    document.querySelectorAll('#lbBody tr').forEach(tr => {
+      tr.onclick = () => { if (tr.dataset.email) openTrader(tr.dataset.email); };
+    });
   }
 }
+
+// ---------- admin: trader detail + trade history ----------
+async function openTrader(email) {
+  const modal = document.getElementById('traderModal');
+  const body = document.getElementById('traderBody');
+  document.getElementById('traderName').textContent = '…';
+  body.innerHTML = '<div class="empty">Loading…</div>';
+  modal.classList.remove('hidden');
+  const r = await api('/api/admin/user?email=' + encodeURIComponent(email));
+  if (r.error) { body.innerHTML = `<div class="empty">${escapeHtml(r.error)}</div>`; return; }
+  document.getElementById('traderName').textContent = r.name;
+  const status = r.blown ? 'BLOWN 💀' : r.dailyLocked ? 'LOCKED 🔒' : 'ACTIVE 🟢';
+  const pos = r.positions.length
+    ? `<table class="mini-tbl"><thead><tr><th>Sym</th><th class="num">Qty</th><th class="num">Avg</th><th class="num">Last</th><th class="num">uPnL</th></tr></thead><tbody>${r.positions.map(p => `<tr><td>${p.symbol}</td><td class="num ${p.qty > 0 ? 'pos' : 'neg'}">${p.qty > 0 ? '+' : ''}${p.qty}</td><td class="num">${fmtPx(p.avg)}</td><td class="num">${fmtPx(p.last)}</td><td class="num ${pnlClass(p.upnl)}">${fmtMoney(p.upnl)}</td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty">No open positions</div>';
+  const trades = r.trades.length
+    ? `<div class="tr-scroll"><table class="mini-tbl"><thead><tr><th>Time</th><th>Sym</th><th>Side</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Realized</th></tr></thead><tbody>${r.trades.map(t => `<tr><td>${fmtTime(t.t)}</td><td>${t.symbol}</td><td class="${t.side === 'BUY' ? 'pos' : 'neg'}">${t.side}${t.note ? ' ⚠' : ''}</td><td class="num">${t.qty}</td><td class="num">${fmtPx(t.price)}</td><td class="num ${pnlClass(t.realized)}">${t.realized == null ? '—' : fmtMoney(t.realized)}</td></tr>`).join('')}</tbody></table></div>`
+    : '<div class="empty">No trades yet</div>';
+  body.innerHTML =
+    `<div class="tr-meta">${escapeHtml(r.email)}${r.ip ? ' · IP ' + escapeHtml(r.ip) : ''}</div>
+     <div class="tr-stats">
+       <div class="tr-stat"><label>Equity</label><span class="mono">${fmtMoney(r.equity)}</span></div>
+       <div class="tr-stat"><label>P&amp;L</label><span class="mono ${pnlClass(r.pnl)}">${fmtMoney(r.pnl)}</span></div>
+       <div class="tr-stat"><label>Balance</label><span class="mono">${fmtMoney(r.balance)}</span></div>
+       <div class="tr-stat"><label>Status</label><span>${status}</span></div>
+     </div>
+     <h3 class="tr-h">Open positions</h3>${pos}
+     <h3 class="tr-h">Trade history (${r.trades.length})</h3>${trades}`;
+}
+(() => {
+  const modal = document.getElementById('traderModal');
+  const close = () => modal.classList.add('hidden');
+  document.getElementById('traderClose').onclick = close;
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+})();
 
 function setRisk(prefix, used, label) {
   const fill = $(prefix + 'Fill');

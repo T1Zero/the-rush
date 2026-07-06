@@ -785,3 +785,21 @@ body.is-admin .admin-only { display: inline-block !important; }
   padding: 6px 12px; border-radius: 8px; letter-spacing: 1px; user-select: all;
 }
 .adm-hint { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* ============ ADMIN TRADER DETAIL ============ */
+.modal-wide { max-width: 640px; }
+body.is-admin .leaderboard tbody tr { cursor: pointer; }
+body.is-admin .leaderboard tbody tr:hover { background: rgba(0, 229, 255, .07); }
+.tr-meta { font-family: var(--font-mono); font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 16px; }
+.tr-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 6px; }
+.tr-stat { background: rgba(255, 255, 255, .03); border: 1px solid var(--border); border-radius: 10px; padding: 9px 8px; text-align: center; }
+.tr-stat label { display: block; font-size: 9px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+.tr-stat span { font-size: 14px; font-weight: 700; }
+.tr-h { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--cyan); margin: 18px 0 8px; font-weight: 700; }
+.mini-tbl { width: 100%; border-collapse: collapse; }
+.mini-tbl th { text-align: left; font-size: 9.5px; letter-spacing: .5px; color: var(--muted); text-transform: uppercase; padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.mini-tbl th.num { text-align: right; }
+.mini-tbl td { font-family: var(--font-mono); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid rgba(0, 229, 255, .05); white-space: nowrap; }
+.mini-tbl td.num { text-align: right; }
+.tr-scroll { max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
+.tr-scroll thead th { position: sticky; top: 0; background: var(--panel-solid); }
