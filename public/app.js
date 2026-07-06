@@ -550,6 +550,16 @@ function armMusicAutostart() {
   document.addEventListener('keydown', kick);
 }
 
+// ---------- rules modal ----------
+(() => {
+  const modal = document.getElementById('rulesModal');
+  const close = () => modal.classList.add('hidden');
+  document.getElementById('rulesBtn').onclick = () => modal.classList.remove('hidden');
+  document.getElementById('rulesClose').onclick = close;
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+})();
+
 // ---------- boot ----------
 if (token) {
   showApp();
