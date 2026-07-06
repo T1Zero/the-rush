@@ -299,7 +299,12 @@ async function loadCandles(key) {
   const data = r.candles.map(c => ({ ...c, time: c.time + TZ_SHIFT }));
   candleSeries.setData(data);
   lastBar = data[data.length - 1] || null;
-  if (chartKeyLoaded !== key) chart.timeScale().scrollToRealTime();
+  if (chartKeyLoaded !== key) {
+    // switching symbol/timeframe: re-fit the price axis to the new range (e.g. NAS ~30k → SP500 ~7.5k)
+    // so the user doesn't have to scroll, even if they'd manually panned the previous chart.
+    chart.priceScale('right').applyOptions({ autoScale: true });
+    chart.timeScale().scrollToRealTime();
+  }
   chartKeyLoaded = key;
 }
 
