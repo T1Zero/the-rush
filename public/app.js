@@ -114,9 +114,10 @@ function render() {
 
   // risk meters
   const dailyUsed = Math.min(1, Math.max(0, -a.dayPnl / a.dailyLossLimit));
-  const ddUsed = Math.min(1, Math.max(0, (a.highEquity - a.equity) / (a.highEquity - a.drawdownFloor)));
+  const ddDown = a.startBalance - a.equity; // how far below the $50k start (static $2k floor)
+  const ddUsed = Math.min(1, Math.max(0, ddDown / a.maxDrawdown));
   setRisk('riskDaily', dailyUsed, `${fmtMoney(Math.max(0, -a.dayPnl))} / $${a.dailyLossLimit.toLocaleString()}`);
-  setRisk('riskDD', ddUsed, `${fmtMoney(Math.max(0, a.highEquity - a.equity))} / $${(a.highEquity - a.drawdownFloor).toLocaleString()}`);
+  setRisk('riskDD', ddUsed, `${fmtMoney(Math.max(0, ddDown))} / $${a.maxDrawdown.toLocaleString()}`);
 
   // ticker + watchlist (with tick-flash detection)
   const dirs = {};
