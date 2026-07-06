@@ -135,7 +135,7 @@ function render() {
     const ch = d.change || 0;
     const chPct = d.prevClose ? (ch / d.prevClose * 100) : 0;
     return `<div class="watch-row ${sym === selected ? 'selected' : ''} ${dirs[sym]}" data-sym="${sym}">
-      <div><div class="watch-sym">${sym}</div><div class="watch-name">${d.name}</div></div>
+      <div><div class="watch-sym">${sym}</div><div class="watch-name">${d.name} · <b>$${d.pointValue}</b>/pt</div></div>
       <div class="watch-px">
         <div class="p">${fmtPx(d.price)}</div>
         <div class="c ${pnlClass(ch)}">${ch >= 0 ? '+' : ''}${fmt(ch)} · ${chPct >= 0 ? '+' : ''}${chPct.toFixed(2)}%</div>
@@ -149,7 +149,7 @@ function render() {
   // chart + order labels
   const sel = q[selected];
   $('chartTitle').textContent = selected;
-  $('chartName').textContent = sel ? sel.name.toUpperCase() : '';
+  $('chartName').textContent = sel ? `${sel.name.toUpperCase()} · $${sel.pointValue}/PT` : '';
   $('chartPrice').textContent = sel ? fmtPx(sel.price) : '—';
   $('buySym').textContent = selected;
   $('sellSym').textContent = selected;
