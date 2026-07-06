@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 
 let token = localStorage.getItem('ft_token') || null;
 let mode = 'login';
-let selected = 'ES';
+let selected = 'SP500';
 let state = null;
 let pollTimer = null;
 let prevPrices = {};   // symbol -> last seen price (for flash animation)
