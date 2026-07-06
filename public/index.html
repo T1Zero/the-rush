@@ -107,6 +107,7 @@
     <div class="user-box">
       <span id="statusBadge" class="badge ok">ACTIVE</span>
       <span id="uName" class="uname"></span>
+      <button id="adminBtn" class="btn-ghost admin-only" type="button">🔑 Admin</button>
       <button id="btnLogout" class="btn-ghost" type="button">Exit</button>
     </div>
   </header>
@@ -200,6 +201,23 @@
       <div id="noTrades" class="empty">No fills yet</div>
     </section>
   </main>
+</div>
+
+<!-- Admin: password reset tool (admin only) -->
+<div id="adminModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <button class="modal-close" id="adminClose" type="button" aria-label="Close">✕</button>
+    <div class="modal-eyebrow">◢ ADMIN ◣</div>
+    <h2 class="modal-title">Reset a Password</h2>
+    <div class="admin-form">
+      <label>User's email</label>
+      <input id="admEmail" type="email" placeholder="user@example.com" autocomplete="off">
+      <label>New password <span class="lbl-dim">— leave blank to auto-generate</span></label>
+      <input id="admPass" type="text" placeholder="auto-generate" autocomplete="off">
+      <button id="admReset" class="btn-primary" type="button"><span>Reset password</span></button>
+      <div id="admResult" class="adm-result"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Global Rules button + modal (shows on login + dashboard) -->

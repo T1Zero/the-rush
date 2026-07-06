@@ -760,3 +760,28 @@ tbody tr:last-child td { border-bottom: none; }
 .tag.soft { background: rgba(255, 209, 102, .15); color: var(--gold); border: 1px solid rgba(255, 209, 102, .35); }
 
 @media (max-width: 560px) { .rules-fab { padding: 9px 13px; font-size: 12px; } }
+
+/* ============ ADMIN PASSWORD-RESET TOOL ============ */
+.admin-only { display: none !important; }
+body.is-admin .admin-only { display: inline-block !important; }
+#adminBtn { color: var(--cyan); border-color: var(--border-hot); }
+#adminBtn:hover { color: var(--cyan); border-color: var(--cyan); }
+.admin-form { display: grid; gap: 8px; }
+.admin-form label { font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 6px; }
+.admin-form input {
+  padding: 11px 13px; background: rgba(4, 5, 13, .6);
+  border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+  font-family: var(--font-ui); font-size: 14px;
+}
+.admin-form input:focus { outline: none; border-color: var(--cyan); }
+.admin-form .btn-primary { margin-top: 14px; }
+.adm-result { margin-top: 14px; font-size: 13px; min-height: 20px; line-height: 1.5; }
+.adm-result.neg { color: var(--red); }
+.adm-result.pos { color: var(--text); }
+.adm-pass {
+  display: inline-block; margin: 6px 0;
+  font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--cyan);
+  background: rgba(0, 229, 255, .1); border: 1px solid var(--border-hot);
+  padding: 6px 12px; border-radius: 8px; letter-spacing: 1px; user-select: all;
+}
+.adm-hint { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }

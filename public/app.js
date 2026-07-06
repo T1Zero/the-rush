@@ -565,6 +565,30 @@ function armMusicAutostart() {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 })();
 
+// ---------- admin: password reset tool ----------
+(() => {
+  const modal = document.getElementById('adminModal');
+  const close = () => modal.classList.add('hidden');
+  const btn = document.getElementById('adminBtn');
+  if (btn) btn.onclick = () => { document.getElementById('admResult').textContent = ''; modal.classList.remove('hidden'); };
+  document.getElementById('adminClose').onclick = close;
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  document.getElementById('admReset').onclick = async () => {
+    const email = document.getElementById('admEmail').value.trim();
+    const password = document.getElementById('admPass').value.trim();
+    const out = document.getElementById('admResult');
+    if (!email) { out.textContent = 'Enter the user’s email.'; out.className = 'adm-result neg'; return; }
+    out.textContent = 'Resetting…'; out.className = 'adm-result';
+    const r = await api('/api/admin/set-password', 'POST', { email, password });
+    if (r.error) { out.textContent = '✕ ' + r.error; out.className = 'adm-result neg'; return; }
+    out.className = 'adm-result pos';
+    out.innerHTML = `✓ New password for <b>${escapeHtml(r.name)}</b> (${escapeHtml(r.email)}):`
+      + `<br><span class="adm-pass">${escapeHtml(r.password)}</span>`
+      + `<span class="adm-hint">Copy it and send it to them (e.g. in Discord). They log in with this.</span>`;
+    document.getElementById('admPass').value = '';
+  };
+})();
+
 // ---------- boot ----------
 if (token) {
   showApp();
