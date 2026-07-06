@@ -316,6 +316,8 @@ function ensureChart() {
 // paint the live price onto the current bar between full refreshes
 function tickChart(price) {
   if (!candleSeries || price == null || chartKeyLoaded !== chartKey()) return;
+  // reject outlier ticks (>0.6% from the last close) so a bad quote can't draw a spike
+  if (lastBar && Math.abs(price - lastBar.close) / lastBar.close > 0.006) return;
   const sec = TF_SEC[timeframe] || 60;
   const t = Math.floor((Date.now() / 1000 + TZ_SHIFT) / sec) * sec;
   if (lastBar && t <= lastBar.time) {
