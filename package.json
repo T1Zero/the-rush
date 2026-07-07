@@ -10,6 +10,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@libsql/client": "^0.14.0",
     "@upstash/redis": "^1.34.0"
   }
 }
