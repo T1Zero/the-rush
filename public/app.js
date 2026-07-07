@@ -67,7 +67,7 @@ function showApp() {
   stopMusic();
   refresh();
   clearInterval(pollTimer);
-  pollTimer = setInterval(refresh, 2000);
+  pollTimer = setInterval(refresh, 4000); // 4s polling to cut DB load under live tournament traffic
 }
 
 async function refresh() {
